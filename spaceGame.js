@@ -6,6 +6,7 @@ var score = 0;
 
 class stc{
   constructor(x,y,w,h,c,v,stopL,stopR){
+    this.soundShoot;
     this.go = false;
     this.x = x/2-w/2;
     this.y = y-2*w;
@@ -16,6 +17,39 @@ class stc{
     this.stopL = false;
     this.stopR = false;
     this.reset();
+
+    this.soundShoot = document.createElement("audio");
+    this.soundShoot.src  = "shoot.wav";
+    this.soundShoot.setAttribute("preload","auto");
+    this.soundShoot.setAttribute("controls","none");
+    this.soundShoot.style.display = "none";
+    document.body.appendChild(this.soundShoot);
+
+    this.soundKilled = document.createElement("audio");
+    this.soundKilled.src = "invaderkilled.wav";
+    this.soundKilled.setAttribute("preload","none");
+    this.soundKilled.setAttribute("controls","none");
+    this.soundKilled.style.display = "none";
+    document.body.appendChild(this.soundKilled);
+
+    this.soundDead = document.createElement("audio");
+    this.soundDead.src = "explosion.wav";
+    this.soundDead.setAttribute("preload","none");
+    this.soundDead.setAttribute("controls","none");
+    this.soundDead.style.display = "none";
+    document.body.appendChild(this.soundDead);
+  }
+
+  playShootSound(){
+    this.soundShoot.play();
+  }
+
+  playKilledSound(){
+    this.soundKilled.play();
+  }
+
+  playDeadSound(){
+    this.soundDead.play();
   }
 
   reset(){
@@ -49,12 +83,14 @@ class stc{
   }
 
   gameOver(){
+    setTimeout(() =>{
     //clear(st.x,st.y,st.w,st.h,"black");
     st.go = true;
     ct.fillStyle = "white";
     ct.font = cv.width/25+"px sans-serif";
     ct.fillText("Game Over Click Space to Play Again",cv.width/6,cv.height/7);
     am.stop = true;
+  },500)
   }
 
     restart(){
@@ -116,6 +152,7 @@ class ammo{
     am.ok = false;
     let inter = setInterval(() => {
       if(this.check()){
+        setTimeout(st.playKilledSound(),200);
         clearInterval(inter);
         changeScore();
         clear(this.x,this.y,this.w,this.h,"black")
@@ -165,6 +202,7 @@ class target{
       }
       else if(this.y >= cv.height - 3*st.h){
         clearInterval(inter);
+        setTimeout(st.playDeadSound(),150);
         clear(this.x-1,this.y-1,this.w+2,this.h+2,"black");
         this.stop = false;
         st.gameOver();
@@ -228,6 +266,7 @@ const keyDown = (e) =>{
     }
     else if(!am.stop){
     drawRect(am.x,am.y,am.w,am.h,am.c);
+    setTimeout(st.playShootSound(),200);
     am.move();
     }
   }
